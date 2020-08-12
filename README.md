@@ -20,6 +20,9 @@ Points for help: You have to use ~~AWS Cloudformation~~ Terraform for cloud serv
  The architecture design should be the core backbone or microservice.
 Container orchestration tools:  AWS EKS.
 
+### Architecture Diagram
+![Architecture Diagram](img/arch-diagram.png "Architecture Diagram")
+
 ### Tech Stack
 | Type | Tool |
 | :--- | :--- |
