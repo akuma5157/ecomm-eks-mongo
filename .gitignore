@@ -1,3 +1,6 @@
 .idea/*
 .terraform/*
+*/.terraform/*
 .vscode/*
+/infra/plan
+/infra/plan.json

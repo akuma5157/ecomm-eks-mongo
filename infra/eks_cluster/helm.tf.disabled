@@ -1,0 +1,42 @@
+resource "null_resource" "helm_charts" {
+  depends_on = ["module.eks"]
+
+  triggers = {
+    cluster_endpoint = module.eks.cluster_endpoint
+  }
+
+  provisioner "local-exec" {
+    working_dir = path.module
+    command     = "chmod u+x  ./scripts/helm-install.sh"
+  }
+
+  provisioner "local-exec" {
+    working_dir = path.module
+    command     = "./scripts/helm-install.sh"
+    interpreter = ["/bin/sh", "-c"]
+
+    environment = {
+      REGION      = var.AWS_REGION
+      CLUSTER_NAME      = "${var.name}-EKS"
+      KUBECONFIG        = "${path.cwd}/kubeconfig_${var.name}-EKS"
+    }
+  }
+
+  provisioner "local-exec" {
+    working_dir = path.module
+    when        = "destroy"
+    command     = "chmod u+x  ./scripts/helm-uninstall.sh"
+  }
+
+  provisioner "local-exec" {
+    working_dir = path.module
+    when        = "destroy"
+
+    command     = "./scripts/helm-uninstall.sh"
+    interpreter = ["/bin/sh", "-c"]
+
+    environment = {
+      KUBECONFIG = "${path.cwd}/kubeconfig_${var.name}-EKS"
+    }
+  }
+}
