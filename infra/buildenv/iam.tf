@@ -1,4 +1,4 @@
-data "aws_iam_policy_document" "test-poc-cicd" {
+data "aws_iam_policy_document" "cicd" {
   statement {
     sid = "0"
     effect = "Allow"
@@ -10,7 +10,7 @@ data "aws_iam_policy_document" "test-poc-cicd" {
   }
 }
 
-data "aws_iam_policy_document" "test-poc-cicd-trust" {
+data "aws_iam_policy_document" "cicd-trust" {
   statement {
     sid = ""
     effect = "Allow"
@@ -25,22 +25,22 @@ data "aws_iam_policy_document" "test-poc-cicd-trust" {
 }
 
 resource "aws_iam_policy" "cicd-policy" {
-  name        = "${var.NAME}-cicd-policy"
-  description = "for ${var.NAME} jenkins server"
-  policy = data.aws_iam_policy_document.test-poc-cicd.json
+  name = "${var.name}-cicd-policy"
+  description = "for ${var.name} jenkins server"
+  policy = data.aws_iam_policy_document.cicd.json
 }
 
 resource "aws_iam_role" "cicd-role" {
-  name = "${var.NAME}-cicd"
-  assume_role_policy = data.aws_iam_policy_document.test-poc-cicd-trust.json
+  name = "${var.name}-cicd"
+  assume_role_policy = data.aws_iam_policy_document.cicd-trust.json
 }
 
-resource "aws_iam_role_policy_attachment" "test-poc-cicd" {
+resource "aws_iam_role_policy_attachment" "cicd" {
   policy_arn = aws_iam_policy.cicd-policy.arn
-  role       = aws_iam_role.cicd-role.name
+  role = aws_iam_role.cicd-role.name
 }
 
 resource "aws_iam_instance_profile" "cicd-profile" {
-  name = "${var.NAME}-cicd-profile"
+  name = "${var.name}-cicd-profile"
   role = aws_iam_role.cicd-role.name
 }

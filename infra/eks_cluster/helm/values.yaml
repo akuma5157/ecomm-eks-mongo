@@ -1,9 +1,0 @@
-prometheus:
-  service:
-    type: LoadBalancer
-grafana:
-  service:
-    type: LoadBalancer
-alertmanager:
-  service:
-    type: LoadBalancer

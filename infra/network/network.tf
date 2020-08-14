@@ -11,7 +11,7 @@ module "vpc" {
   enable_nat_gateway  = true
   one_nat_gateway_per_az = true
   enable_vpn_gateway  = false
-  enable_dhcp_options = false
+  enable_dhcp_options = true
 
   tags = {
     Environment = var.env
@@ -31,7 +31,7 @@ module "vpc" {
 data "aws_subnet_ids" "bastion" {
   vpc_id = module.vpc.vpc_id
   filter {
-    name   = "cidr:Name"
+    name   = "cidr"
     values = var.public_subnet_bastion_cidr
   }
 }

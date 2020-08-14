@@ -13,11 +13,6 @@ variable "name" {
   default = "test"
 }
 
-variable "INSTANCE_TYPE" {
-  type = string
-  default = "t2.medium"
-}
-
 variable "map_users" {
   description = "Additional IAM users to add to the aws-auth configmap."
   default = [
@@ -40,37 +35,40 @@ variable "map_roles" {
   ]
 }
 
-variable "PUB_SEC_GRP_CIDR_LIST" {
-  type = list
-  default = ["0.0.0.0/0"]
+variable "bastion_instance_type" {
+  default = "t2.micro"
 }
 
-variable "EKS_INSTANCE_TYPE" {
-  default = "t2.medium"
+variable "bastion_sec_grp_allow_ips" {
+  type = list(string)
+  default = ["127.0.0.1/32"]
 }
 
-variable "ELK_INSTANCE_TYPE" {
-  default = "t2.large"
+variable "bastion_asg_min_size" {
+  default = "1"
 }
 
-variable "ASG_MIN_SIZE" {
-  description = "Min nodes the cluster will have."
-  default     = "2"
+variable "bastion_asg_max_size" {
+  default = "2"
 }
 
-variable "ASG_MAX_SIZE" {
-  description = "Max nodes the cluster will autoscale to."
-  default     = "3"
+variable "jenkins_instance_type" {
+  default = "t2.micro"
 }
 
-variable "KAFKA_BROKERS_COUNT" {
-  type = number
-  default = 0
+variable "jenkins_sec_grp_allow_ips" {
+  type = list(string)
+  default = ["127.0.0.1/32"]
 }
 
-variable "JENKINS_ADMIN_PASSWD" {
+variable "jenkins_admin_username" {
   type = string
-  default = "CAPGadmin1"
+  default = "admin"
+}
+
+variable "jenkins_admin_password" {
+  type = string
+  default = "admin"
 }
 
 variable "private_subnet_build_cidr" {

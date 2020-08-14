@@ -3,7 +3,7 @@ module "eks" {
   version      = "12.2.0"
   cluster_version = "1.17"
   cluster_name = "${var.name}-EKS"
-  subnets      = concat(var.private_subnets_build,var.private_subnets_app, var.private_subnets_db)
+  subnets      = concat(var.public_subnets_bastion, var.private_subnets_build, var.private_subnets_app, var.private_subnets_db)
   tags         = {
     Name = "${var.name}-EKS"
     Environment = var.env
@@ -46,4 +46,32 @@ module "eks" {
   )
   map_users          = var.map_users
   map_roles          = var.map_roles
+}
+provider "kubernetes" {
+  config_path = "kubeconfig_${var.name}-EKS"
+}
+
+resource "kubernetes_namespace" "build" {
+  metadata {
+    labels = {
+      Name = "build"
+    }
+    name = "build"
+  }
+}
+resource "kubernetes_namespace" "app" {
+  metadata {
+    labels = {
+      Name = "app"
+    }
+    name = "app"
+  }
+}
+resource "kubernetes_namespace" "db" {
+  metadata {
+    labels = {
+      Name = "db"
+    }
+    name = "db"
+  }
 }

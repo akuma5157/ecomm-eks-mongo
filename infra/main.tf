@@ -21,6 +21,8 @@ data "aws_ami" "ubuntu" {
     "099720109477"]
 }
 
+data "aws_caller_identity" "current" {}
+
 module "network" {
   source = "./network"
   aws_region = var.aws_region
@@ -31,23 +33,31 @@ module "network" {
   private_subnet_app_cidr = var.private_subnet_app_cidr
   private_subnet_db_cidr = var.private_subnet_db_cidr
 }
-//
-//module "buildenv" {
-//  source = "./buildenv"
-//  AWS_REGION = var.AWS_REGION
-//  env = var.env
-//  name = var.name
-//  AMI_ID = data.aws_ami.ubuntu.image_id
-//  INSTANCE_TYPE = "t2.medium"
-//  KEY = module.network.key-name
-//  SUBNET_ID = module.network.public_subnets
-//  VPC_ID = module.network.vpc_id
-//  VPC_CIDR = module.network.vpc_cidr
-//  PUB_SEC_GRP_CIDR_LIST = var.PUB_SEC_GRP_CIDR_LIST
-//  JENKINS_ADMIN_PASSWD = var.JENKINS_ADMIN_PASSWD
-//}
-//
-module "runenv" {
+
+module "buildenv" {
+  source = "./buildenv"
+  aws_region = var.aws_region
+  env = var.env
+  name = var.name
+  vpc_id = module.network.vpc_id
+  vpc_cidr = module.network.vpc_cidr
+  bastion_ami_id = data.aws_ami.ubuntu.image_id
+  bastion_instance_type = var.jenkins_instance_type
+  bastion_key = module.network.key-name
+  bastion_subnet_ids = module.network.public_subnets_bastion
+  bastion_sec_grp_allow_ips = var.bastion_sec_grp_allow_ips
+  bastion_asg_min_size = var.bastion_asg_min_size
+  bastion_asg_max_size = var.bastion_asg_max_size
+  jenkins_ami_id = data.aws_ami.ubuntu.image_id
+  jenkins_instance_type = var.jenkins_instance_type
+  jenkins_key = module.network.key-name
+  jenkins_subnet_id = module.network.private_subnets_build[0]
+  jenkins_sec_grp_allow_ips = var.jenkins_sec_grp_allow_ips
+  jenkins_admin_username = var.jenkins_admin_username
+  jenkins_admin_password = var.jenkins_admin_password
+}
+
+module "eks_cluster" {
   source = "./eks_cluster"
   aws_region = var.aws_region
   env = var.env
@@ -62,54 +72,26 @@ module "runenv" {
   db_asg_max_size = var.db_asg_max_size
   db_asg_instance_type = var.db_asg_instance_type
   vpc_id = module.network.vpc_id
-//  map_roles = concat(var.map_roles, [
-//                {
-//                  role_arn = module.buildenv.cicd_role.arn   // "arn:aws:iam::123456789012:role/collections-terraform-ec2"
-//                  username = module.buildenv.cicd_role.name  // "collections-terraform-ec2"
-//                  group    = "system:masters"
-//                }
-//              ])
+  private_subnets_app = module.network.private_subnets_app
+  private_subnets_build = module.network.private_subnets_build
+  private_subnets_db = module.network.private_subnets_db
+  public_subnets_bastion = module.network.public_subnets_bastion
+  map_users = concat(var.map_users, [
+                {
+                  userarn = data.aws_caller_identity.current.arn
+                  username = data.aws_caller_identity.current.user_id
+                  groups = ["system:masters"]
+                }
+              ])
+  map_roles = concat(var.map_roles, [
+                {
+                  rolearn = module.buildenv.cicd_role.arn
+                  username = module.buildenv.cicd_role.name
+                  groups = ["system:masters"]
+                }
+              ])
 }
 
-//resource "null_resource" "jenkins_config" {
-//  depends_on = [
-//    module.eks_cluster.kubectl_config,
-//    module.eks_cluster.kafka_zookeeper,
-//    module.eks_cluster.mariadb,
-//    module.network.key-name,
-//    module.buildenv.nexus,
-//    module.buildenv.jenkins
-//  ]
-//
-//  triggers = {
-//    kubectl = module.eks_cluster.kubectl_config
-//    key-name = module.network.key-name
-//    zookeeper = module.eks_cluster.kafka_zookeeper.private_ip
-//    mariadb = module.eks_cluster.mariadb.private_ip
-//    jenkins = module.buildenv.jenkins.private_ip
-//    nexus = module.buildenv.nexus.private_ip
-//    config_file = file("./jenkins_config.tpl.sh")
-//  }
-//
-//  provisioner "local-exec" {
-//    working_dir = path.module
-//    command = templatefile("./jenkins_config.tpl.sh",
-//              {
-//                key_file    = module.network.key-name
-//                jenkins_ip  = module.buildenv.jenkins.public_ip
-//                nexus_ip    = module.buildenv.nexus.private_ip
-//                mariadb_ip  = module.eks_cluster.mariadb.private_ip
-//                kafka_ip    = module.eks_cluster.kafka_zookeeper.private_ip
-//                sonar_ip    = module.buildenv.sonarqube.private_ip
-//                kubeconfig  = "kubeconfig_${var.name}-EKS"
-//              }
-//    )
-//    interpreter = [
-//      "/bin/bash",
-//      "-c"]
-//  }
-//}
-//
 //resource "null_resource" "bastion-config" {
 //  depends_on = [
 //    module.eks_cluster.kubectl_config,
@@ -134,7 +116,7 @@ module "runenv" {
 //                    "curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl ; ",
 //                    "chmod +x ./kubectl ; ",
 //                    "sudo mv ./kubectl /usr/local/bin/kubectl ; ",
-//                    "curl -o aws-iam-authenticator https://amazon-eks.s3-us-west-2.amazonaws.com/1.13.7/2019-06-11/bin/linux/amd64/aws-iam-authenticator ; ",
+//                    "curl -o aws-iam-authenticator https://amazon-eks.s3.us-west-2.amazonaws.com/1.17.7/2020-07-08/bin/linux/amd64/aws-iam-authenticator ; ",
 //                    "chmod +x ./aws-iam-authenticator ; ",
 //                    "sudo mv ./aws-iam-authenticator /usr/local/bin/aws-iam-authenticator ; '",
 //              ])

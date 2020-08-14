@@ -1,0 +1,19 @@
+hosts: all
+roles:
+  - role: geerlingguy.jenkins
+vars:
+  jenkins_http_port: 80
+  jenkins_plugins:
+    - kubernetes
+    - workflow-job
+    - workflow-aggregator
+    - credentials-binding
+    - git
+    - command-launcher
+    - github-branch-sourceb
+    - docker-workflow
+    - pipeline-utility-steps
+  jenkins_plugins_state: latest
+  jenkins.hostname: {{ inventory.hostname }}
+  java_packages:
+      - openjdk-8-jdk
