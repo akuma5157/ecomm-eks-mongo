@@ -11,6 +11,7 @@ module "eks" {
   vpc_id       = var.vpc_id
   cluster_create_timeout = "30m"
   cluster_delete_timeout = "30m"
+  cluster_endpoint_private_access = true
 
   worker_groups = list(
     {
@@ -47,11 +48,9 @@ module "eks" {
   map_users          = var.map_users
   map_roles          = var.map_roles
 }
-provider "kubernetes" {
-  config_path = "kubeconfig_${var.name}-EKS"
-}
 
 resource "kubernetes_namespace" "build" {
+  depends_on = [module.eks.cluster_id]
   metadata {
     labels = {
       Name = "build"
@@ -60,6 +59,7 @@ resource "kubernetes_namespace" "build" {
   }
 }
 resource "kubernetes_namespace" "app" {
+  depends_on = [module.eks.cluster_id]
   metadata {
     labels = {
       Name = "app"
@@ -68,6 +68,7 @@ resource "kubernetes_namespace" "app" {
   }
 }
 resource "kubernetes_namespace" "db" {
+  depends_on = [module.eks.cluster_id]
   metadata {
     labels = {
       Name = "db"

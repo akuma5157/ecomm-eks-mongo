@@ -9,9 +9,12 @@ module "vpc" {
   public_subnets  = var.public_subnet_bastion_cidr
 
   enable_nat_gateway  = true
-  one_nat_gateway_per_az = true
+  single_nat_gateway = true
+//  one_nat_gateway_per_az = true
   enable_vpn_gateway  = false
   enable_dhcp_options = true
+  enable_dns_hostnames = true
+  enable_dns_support = true
 
   tags = {
     Environment = var.env
@@ -28,35 +31,43 @@ module "vpc" {
   }
 }
 
-data "aws_subnet_ids" "bastion" {
+data "aws_subnet" "bastion" {
+  depends_on = [module.vpc.public_subnets]
+  count = length(var.public_subnet_bastion_cidr)
   vpc_id = module.vpc.vpc_id
   filter {
     name   = "cidr"
-    values = var.public_subnet_bastion_cidr
+    values = [element(var.public_subnet_bastion_cidr, count.index)]
   }
 }
 
-data "aws_subnet_ids" "build" {
+data "aws_subnet" "build" {
+  depends_on = [module.vpc.private_subnets]
+  count = length(var.private_subnet_build_cidr)
   vpc_id = module.vpc.vpc_id
   filter {
     name   = "cidr"
-    values = var.private_subnet_build_cidr
+    values = [element(var.private_subnet_build_cidr, count.index)]
   }
 }
 
-data "aws_subnet_ids" "app" {
+data "aws_subnet" "app" {
+  depends_on = [module.vpc.private_subnets]
+  count = length(var.private_subnet_app_cidr)
   vpc_id = module.vpc.vpc_id
   filter {
     name   = "cidr"
-    values = var.private_subnet_app_cidr
+    values = [element(var.private_subnet_app_cidr, count.index)]
   }
 }
 
-data "aws_subnet_ids" "db" {
+data "aws_subnet" "db" {
+  depends_on = [module.vpc.private_subnets]
+  count = length(var.private_subnet_db_cidr)
   vpc_id = module.vpc.vpc_id
   filter {
     name   = "cidr"
-    values = var.private_subnet_db_cidr
+    values = [element(var.private_subnet_db_cidr, count.index)]
   }
 }
 

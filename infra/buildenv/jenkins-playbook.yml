@@ -1,19 +1,41 @@
-hosts: all
-roles:
-  - role: geerlingguy.jenkins
-vars:
-  jenkins_http_port: 80
-  jenkins_plugins:
-    - kubernetes
-    - workflow-job
-    - workflow-aggregator
-    - credentials-binding
-    - git
-    - command-launcher
-    - github-branch-sourceb
-    - docker-workflow
-    - pipeline-utility-steps
-  jenkins_plugins_state: latest
-  jenkins.hostname: {{ inventory.hostname }}
-  java_packages:
-      - openjdk-8-jdk
+- hosts: all
+  become: true
+
+  vars:
+    jenkins_java_options: "-Djenkins.install.runSetupWizard=false"
+    jenkins_plugins:
+      - kubernetes
+      - git
+      - pipeline-utility-steps
+      - docker-workflow
+      - credentials-binding
+      - workflow-aggregator
+      - workflow-job
+      - github-branch-source
+      - command-launcher
+      - pipeline-utility-steps
+    jenkins_plugins_state: latest
+    jenkins_hostname: "{{ ansible_hostname }}"
+    java_packages:
+        - openjdk-8-jdk
+  pre_tasks:
+    - name: Update apt cache.
+      apt: update_cache=yes cache_valid_time=600
+      when: ansible_os_family == 'Debian'
+      changed_when: false
+  roles:
+    - role: geerlingguy.java
+    - role: geerlingguy.jenkins
+
+  tasks:
+    - name: Forward port 80 to 8080
+      iptables:
+        table: nat
+        chain: PREROUTING
+        in_interface: eth0
+        protocol: tcp
+        match: tcp
+        destination_port: 80
+        jump: REDIRECT
+        to_ports: 8080
+        comment: Redirect web traffic to port 8080

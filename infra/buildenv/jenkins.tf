@@ -34,7 +34,7 @@ resource "aws_security_group" "jenkins" {
 
 resource "aws_instance" "jenkins" {
   ami           = var.jenkins_ami_id
-  instance_type = var.jenkins_ami_id
+  instance_type = var.jenkins_instance_type
   subnet_id = var.jenkins_subnet_id
   vpc_security_group_ids = [aws_security_group.jenkins.id]
   key_name = var.jenkins_key
@@ -49,7 +49,7 @@ resource "aws_instance" "jenkins" {
     Name = "${var.name}-jenkins-master"
   }
 }
-resource "null_resource" "jenkins_config" {
+resource "null_resource" "jenkins_update" {
   depends_on = [
     aws_instance.jenkins
   ]
@@ -59,6 +59,6 @@ resource "null_resource" "jenkins_config" {
   }
   provisioner "local-exec" {
     working_dir = path.module
-    command = "ansible-playbook -u ubuntu -i ${aws_instance.jenkins.public_dns}, jenkins-playbook.yml --private-key ${path.cwd}/${var.name}_key -e jenkins_admin_username='${var.jenkins_admin_username}' -e jenkins_admin_password='${var.jenkins_admin_password}'"
+    command = "ansible-playbook -u ubuntu -i ${aws_instance.jenkins.public_dns}, jenkins-playbook.yml --ssh-extra-args '-o StrictHostKeyChecking=no' --private-key ${path.cwd}/${var.name}_key -e jenkins_admin_username='${var.jenkins_admin_username}' -e jenkins_admin_password='${var.jenkins_admin_password}' -e ansible_python_interpreter='/usr/bin/python3'"
   }
 }

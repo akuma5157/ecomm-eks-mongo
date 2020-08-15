@@ -5,12 +5,17 @@ variable "aws_region" {
 
 variable "env" {
   type = string
-  default = "Collections"
+  default = "test"
+}
+
+variable "route53_domain_name" {
+  type = string
+  default = "ecomm-eks-mongo-akuma.com"
 }
 
 variable "name" {
   type = string
-  default = "test"
+  default = "try"
 }
 
 variable "map_users" {

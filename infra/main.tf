@@ -51,7 +51,7 @@ module "buildenv" {
   jenkins_ami_id = data.aws_ami.ubuntu.image_id
   jenkins_instance_type = var.jenkins_instance_type
   jenkins_key = module.network.key-name
-  jenkins_subnet_id = module.network.private_subnets_build[0]
+  jenkins_subnet_id = module.network.public_subnets_bastion[0]
   jenkins_sec_grp_allow_ips = var.jenkins_sec_grp_allow_ips
   jenkins_admin_username = var.jenkins_admin_username
   jenkins_admin_password = var.jenkins_admin_password
