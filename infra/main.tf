@@ -28,6 +28,7 @@ module "network" {
   aws_region = var.aws_region
   env = var.env
   name = var.name
+  vpc_cidr = var.vpc_cidr
   public_subnet_bastion_cidr = var.public_subnet_bastion_cidr
   private_subnet_build_cidr = var.private_subnet_build_cidr
   private_subnet_app_cidr = var.private_subnet_app_cidr
@@ -62,6 +63,8 @@ module "eks_cluster" {
   aws_region = var.aws_region
   env = var.env
   name = var.name
+  domain_name = module.domain.domain_name
+  cert_arn = module.cert.arn
   build_asg_min_size = var.build_asg_min_size
   build_asg_max_size = var.build_asg_max_size
   build_asg_instance_type = var.build_asg_instance_type
@@ -90,6 +93,17 @@ module "eks_cluster" {
                   groups = ["system:masters"]
                 }
               ])
+}
+
+module "domain" {
+  source = "./domain"
+  domain_name = var.route53_domain_name
+}
+
+module "cert" {
+  source = "./cert"
+  domain_name = module.domain.domain_name
+  hosted_zone_id = module.domain.hosted_zone_id
 }
 
 //resource "null_resource" "bastion-config" {

@@ -39,7 +39,7 @@ resource "aws_instance" "jenkins" {
   vpc_security_group_ids = [aws_security_group.jenkins.id]
   key_name = var.jenkins_key
   root_block_device {
-      volume_size = 20
+      volume_size = 8
       delete_on_termination = true
   }
   iam_instance_profile = aws_iam_instance_profile.cicd-profile.name

@@ -19,6 +19,7 @@ module "eks" {
       asg_max_size = var.build_asg_max_size,
       asg_min_size = var.build_asg_min_size,
       instance_type = var.build_asg_instance_type,
+      kubelet_extra_args = "--node-labels=tier=build"
       name = "build",
       autoscaling_enabled = true,
       protect_from_scale_in = false,
@@ -29,6 +30,7 @@ module "eks" {
       asg_max_size = var.app_asg_max_size,
       asg_min_size = var.app_asg_min_size,
       instance_type = var.app_asg_instance_type,
+      kubelet_extra_args = "--node-labels=tier=app"
       name = "app",
       autoscaling_enabled = true,
       protect_from_scale_in = false,
@@ -39,6 +41,7 @@ module "eks" {
       asg_max_size = var.db_asg_max_size,
       asg_min_size = var.db_asg_min_size,
       instance_type = var.db_asg_instance_type,
+      kubelet_extra_args = "--node-labels=tier=data"
       name = "db",
       autoscaling_enabled = true,
       protect_from_scale_in = false,

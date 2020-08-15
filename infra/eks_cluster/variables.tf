@@ -101,3 +101,12 @@ variable "db_asg_max_size" {
 variable "db_asg_instance_type" {
   default = "t2.micro"
 }
+
+variable "domain_name" {
+  default = ""
+}
+
+variable "cert_arn" {
+  type = string
+  default = ""
+}

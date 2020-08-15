@@ -6,3 +6,6 @@ infra/plan
 infra/plan.json
 infra/terraform*
 infra/.terraform*
+infra/*_key*
+infra/kubeconfig_*-EKS
+infra/buildenv/jenkins-playbook.retry
