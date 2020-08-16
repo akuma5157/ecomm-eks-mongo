@@ -75,7 +75,47 @@ This will ensure confidence in the DR setup as well as keep the backups hot.
 https://gitlab.com/akuma5157/samplespringapp/-/blob/master/Jenkinsfile-shell
 https://gitlab.com/akuma5157/samplespringapp/-/blob/master/Jenkinsfile
 
+#### Setup Steps
+```shell script
+echo installing terraform
+curl https://releases.hashicorp.com/terraform/0.13.0/terraform_0.13.0_linux_amd64.zip
+unzip terraform_0.13.0_linux_amd64.zip
+chmod +x ./terraform
+sudo mv terraform /usr/local/bin/
 
+echo installing kubectl
+curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl ; ",
+chmod +x ./kubectl
+sudo mv ./kubectl /usr/local/bin/
+
+echo installing aws-iam-authenticator
+curl -o aws-iam-authenticator https://amazon-eks.s3.us-west-2.amazonaws.com/1.17.7/2020-07-08/bin/linux/amd64/aws-iam-authenticator
+chmod +x ./aws-iam-authenticator
+sudo mv ./aws-iam-authenticator /usr/local/bin/
+
+echo installing helm3
+curl https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 | bash
+
+echo installing helm repos
+helm repo add stable       https://kubernetes-charts.storage.googleapis.com
+helm repo add bitnami      https://charts.bitnami.com/bitnami
+helm repo add incubator    http://storage.googleapis.com/kubernetes-charts-incubator
+helm repo add nginx-stable https://helm.nginx.com/stable                            
+
+echo installing ansible
+curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
+python3 get-pip.py --user
+pip3 install --user ansible
+
+echo installing ansible-roles
+ansible-galaxy install geerlingguy.java
+ansible-galaxy install geerlingguy.jenkins
+ansible-galaxy install geerlingguy.docker
+ansible-galaxy install geerlingguy.helm
+ansible-galaxy install gantsign.maven
+
+
+```
 ### Tech Stack
 | Type | Tool |
 | :--- | :--- |
