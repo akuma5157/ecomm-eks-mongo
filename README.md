@@ -20,6 +20,58 @@ Points for help: You have to use ~~AWS Cloudformation~~ Terraform for cloud serv
  The architecture design should be the core backbone or microservice.
 Container orchestration tools:  AWS EKS.
 
+### Architecture Diagram
+![Architecture Diagram](img/arch-diagram.svg "Architecture Diagram")
+
+### Architecture Description
+The architecture is spread across 3 availability zones over 4 subnet groups.
+* A public facing subnet group to hold bastion hosts, load balancers and NAT Gateways.
+* A private subnet group with a matched worker-group to run non-application loads such as k8s support pods, jenkins workloads, etc.
+* An extended private subnet group with a matched worker-group to run core application loads.
+* A private subnet group with a matched worker-group dedicated to data-persistence loads.
+* DNS with Route53 service
+* AWS ACM for certificate management
+* AWS WAF to work with AWS ALB as an additional firewall
+* S3 with Cloudfront to serve static content globally
+* AWS KMS for encryption key management
+* AWS IAM with AD federation for identity management
+
+#### OS recommendations
+RHEL is a suitable choice for reliable and stable OS for VMs.  
+A minimal and hardened version of RHEL should used as container base image for secure containers wrt to uniformity in system administation.  
+Alpine Linux can also be considered for containers to create lightweight containers assisting with agility.
+
+#### MongoDB
+since the requirement is to have a clustered database, and the to have a cloud-agnostic but freely scalable setup, a MongoDB replicaset with arbiter node is deployed within kubernetes with helm charts. To keep the database secure and to control access, a separate set of subnets, namespace and worker groups are created with specific taints to prevent pods from being scheduled on the same nodes as mongodb pods.  
+API access to mongo db can be controlled via k8s rbac service accounts supported with network policies within cluster and platform firewalls(security groups) on the infra level.
+
+#### Scalablilty and High Availability
+A dedicated /20 cidr block of ~4090x3 ips is assigned to app subnets/worker-group to accomodate free scaling of application pods with help of horizontal-pod-autoscaler and cluster-autoscaler.  
+Traffic will be routed through ALB backed ingress-controller for performance under load.
+
+#### Environments and DR
+Depending upon the the region the eks cluster may be extended and partitioned over available AZs to act as different environments with dedicated networking resources(alb/ingress) to have centralised administration while not adversely affecting production loads.  
+Since this is for an e-commerce platform, RTO and RPO must be both kept low. This can be achieved by extending the cluster over to a different region of the same CSP or a different CSP. A worker group can be provisioned in the DR zone that holds and fraction of pods and serves a fraction of production load during BAU, but is can be scaled out immediately in cases of outages. Network routing can be handled by the DNS and routers within the infrastructure with VPC peering.  
+This will ensure confidence in the DR setup as well as keep the backups hot.
+
+#### Security
+* all data persistence devices/services will be encrypted with AWS KMS managed keys
+* VM access must be secured with GSSAPI and IAM-AD federation
+* Multiple layers of firewall ACLs with WAF over ALB, subnet acl, security groups, k8s rbac and network policies
+* separation of concerns within the cluster with namespaces and node taint-tolerations for pod scheduling
+
+#### IaC implemention
+* VPC with 4 subnet groups across 3 AZs with route tables and nat gateways
+* basion host auto-scaling-group in public subnet
+* EKS Cluster with tainted worker groups in dedicated subnet tiers
+* single node jenkins server setup with ansible config mgmt.
+* jenkins within k8s cluster for scalable and containerised pipeline builds
+* cluster level k8s resources and helm releases
+* ALB backed nginx-ingress : WIP
+* internal security groups : WIP
+* k8s rbac matrix and svc acc : WIP
+
+
 ### Tech Stack
 | Type | Tool |
 | :--- | :--- |
