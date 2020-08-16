@@ -2,6 +2,10 @@ output "cluster_name" {
   description = "EKS Cluster Name"
   value       = "${var.name}-EKS"
 }
+output "cluster_id" {
+  description = "EKS Cluster Name"
+  value       = module.eks.cluster_id
+}
 output "cluster_endpoint" {
   description = "Endpoint for EKS control plane."
   value       = module.eks.cluster_endpoint
@@ -20,4 +24,12 @@ output "kubectl_config" {
 output "config_map_aws_auth" {
   description = "Config map containing the mapping between AWS and K8S users."
   value       = module.eks.config_map_aws_auth
+}
+
+output "eks_cluster_sec_grp" {
+  value = module.eks.cluster_primary_security_group_id
+}
+
+output "eks_oidc_url" {
+  value = module.eks.cluster_oidc_issuer_url
 }

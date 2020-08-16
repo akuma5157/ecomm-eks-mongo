@@ -58,7 +58,7 @@ module "asg" {
   image_id        = var.bastion_ami_id
   key_name        = var.bastion_key
   instance_type   = var.bastion_instance_type
-  security_groups = [aws_security_group.bastion.id]
+  security_groups = [aws_security_group.bastion.id, var.eks_cluster_sec_grp]
   iam_instance_profile = aws_iam_instance_profile.cicd-profile.name
   associate_public_ip_address = true
   recreate_asg_when_lc_changes = true
@@ -72,16 +72,7 @@ module "asg" {
   desired_capacity          = var.bastion_asg_min_size
   wait_for_capacity_timeout = 0
 
-  tags = [
-    {
-      key = "Name"
-      value = "${var.name}-bastion"
-      propagate_at_launch= true
-    },
-    {
-      key = "Environment"
-      value = var.env
-      propagate_at_launch= true
-    }
-  ]
+  tags_as_map = {
+    Environment = var.env
+  }
 }

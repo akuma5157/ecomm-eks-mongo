@@ -1,0 +1,23 @@
+master:
+  useSecurity: true
+  adminUser: admin
+  adminPassword: admin
+  numExecutors: 1
+  installPlugins:
+    - kubernetes
+    - git
+    - pipeline-utility-steps
+    - docker-workflow
+    - credentials-binding
+    - workflow-aggregator
+    - workflow-job
+    - github-branch-source
+    - command-launcher
+    - pipeline-utility-steps
+  overwritePlugins: true
+  master.serviceType: LoadBalancer
+  ingress:
+    enabled: false
+    hostName: jenkins.localhost
+    annotations:
+      kubernetes.io/ingress.class: traefik

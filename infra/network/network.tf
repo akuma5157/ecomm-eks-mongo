@@ -31,45 +31,45 @@ module "vpc" {
   }
 }
 
-data "aws_subnet" "bastion" {
-  depends_on = [module.vpc.public_subnets]
-  count = length(var.public_subnet_bastion_cidr)
-  vpc_id = module.vpc.vpc_id
-  filter {
-    name   = "cidr"
-    values = [element(var.public_subnet_bastion_cidr, count.index)]
-  }
-}
-
-data "aws_subnet" "build" {
-  depends_on = [module.vpc.private_subnets]
-  count = length(var.private_subnet_build_cidr)
-  vpc_id = module.vpc.vpc_id
-  filter {
-    name   = "cidr"
-    values = [element(var.private_subnet_build_cidr, count.index)]
-  }
-}
-
-data "aws_subnet" "app" {
-  depends_on = [module.vpc.private_subnets]
-  count = length(var.private_subnet_app_cidr)
-  vpc_id = module.vpc.vpc_id
-  filter {
-    name   = "cidr"
-    values = [element(var.private_subnet_app_cidr, count.index)]
-  }
-}
-
-data "aws_subnet" "db" {
-  depends_on = [module.vpc.private_subnets]
-  count = length(var.private_subnet_db_cidr)
-  vpc_id = module.vpc.vpc_id
-  filter {
-    name   = "cidr"
-    values = [element(var.private_subnet_db_cidr, count.index)]
-  }
-}
+//data "aws_subnet" "bastion" {
+//  depends_on = [module.vpc.public_subnets]
+//  count = length(var.public_subnet_bastion_cidr)
+//  vpc_id = module.vpc.vpc_id
+//  filter {
+//    name   = "cidr"
+//    values = [element(var.public_subnet_bastion_cidr, count.index)]
+//  }
+//}
+//
+//data "aws_subnet" "build" {
+//  depends_on = [module.vpc.private_subnets]
+//  count = length(var.private_subnet_build_cidr)
+//  vpc_id = module.vpc.vpc_id
+//  filter {
+//    name   = "cidr"
+//    values = [element(var.private_subnet_build_cidr, count.index)]
+//  }
+//}
+//
+//data "aws_subnet" "app" {
+//  depends_on = [module.vpc.private_subnets]
+//  count = length(var.private_subnet_app_cidr)
+//  vpc_id = module.vpc.vpc_id
+//  filter {
+//    name   = "cidr"
+//    values = [element(var.private_subnet_app_cidr, count.index)]
+//  }
+//}
+//
+//data "aws_subnet" "db" {
+//  depends_on = [module.vpc.private_subnets]
+//  count = length(var.private_subnet_db_cidr)
+//  vpc_id = module.vpc.vpc_id
+//  filter {
+//    name   = "cidr"
+//    values = [element(var.private_subnet_db_cidr, count.index)]
+//  }
+//}
 
 provider "tls" {}
 

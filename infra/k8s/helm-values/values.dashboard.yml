@@ -6,4 +6,4 @@ ingress:
   paths:
     - /
   annotations:
-    kubernetes.io/ingress.class: alb
+    kubernetes.io/ingress.class: traefik

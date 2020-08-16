@@ -52,10 +52,11 @@ module "buildenv" {
   jenkins_ami_id = data.aws_ami.ubuntu.image_id
   jenkins_instance_type = var.jenkins_instance_type
   jenkins_key = module.network.key-name
-  jenkins_subnet_id = module.network.public_subnets_bastion[0]
+  jenkins_subnet_id = module.network.public_subnets[0]
   jenkins_sec_grp_allow_ips = var.jenkins_sec_grp_allow_ips
   jenkins_admin_username = var.jenkins_admin_username
   jenkins_admin_password = var.jenkins_admin_password
+  eks_cluster_sec_grp = module.eks_cluster.eks_cluster_sec_grp
 }
 
 module "eks_cluster" {
@@ -75,6 +76,8 @@ module "eks_cluster" {
   db_asg_max_size = var.db_asg_max_size
   db_asg_instance_type = var.db_asg_instance_type
   vpc_id = module.network.vpc_id
+  private_subnets = module.network.private_subnets
+  public_subnets = module.network.public_subnets
   private_subnets_app = module.network.private_subnets_app
   private_subnets_build = module.network.private_subnets_build
   private_subnets_db = module.network.private_subnets_db
@@ -93,6 +96,44 @@ module "eks_cluster" {
                   groups = ["system:masters"]
                 }
               ])
+}
+
+data "aws_eks_cluster" "cluster" {
+  name  = module.eks_cluster.cluster_id
+}
+
+data "aws_eks_cluster_auth" "cluster" {
+  name  = module.eks_cluster.cluster_id
+}
+
+provider "kubernetes" {
+  host                   = data.aws_eks_cluster.cluster.endpoint
+  cluster_ca_certificate = base64decode(data.aws_eks_cluster.cluster.certificate_authority.0.data)
+  token                  = data.aws_eks_cluster_auth.cluster.token
+  load_config_file       = false
+}
+
+provider "helm" {
+  kubernetes {
+    host                   = data.aws_eks_cluster.cluster.endpoint
+    cluster_ca_certificate = base64decode(data.aws_eks_cluster.cluster.certificate_authority.0.data)
+    token                  = data.aws_eks_cluster_auth.cluster.token
+    load_config_file       = false
+  }
+}
+
+module "k8s" {
+  source = "./k8s"
+  depends_on = [module.eks_cluster]
+  vpc_id = module.network.vpc_id
+  name = var.name
+  aws_region = var.aws_region
+  domain_name = module.domain.domain_name
+  cert_arn = module.cert.arn
+  eks_cluster_name = module.eks_cluster.cluster_name
+  eks_oidc_url = module.eks_cluster.eks_oidc_url
+  private_subnets = module.network.private_subnets
+  public_subnets = module.network.public_subnets
 }
 
 module "domain" {

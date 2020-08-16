@@ -3,7 +3,7 @@ module "eks" {
   version      = "12.2.0"
   cluster_version = "1.17"
   cluster_name = "${var.name}-EKS"
-  subnets      = concat(var.public_subnets_bastion, var.private_subnets_build, var.private_subnets_app, var.private_subnets_db)
+  subnets      = concat(var.private_subnets, var.public_subnets)
   tags         = {
     Name = "${var.name}-EKS"
     Environment = var.env
@@ -23,59 +23,31 @@ module "eks" {
       name = "build",
       autoscaling_enabled = true,
       protect_from_scale_in = false,
-      subnets = var.private_subnets_build,
+      subnets = slice(var.private_subnets, 0, 3)
     },
     {
       asg_desired_capacity = var.app_asg_min_size,
       asg_max_size = var.app_asg_max_size,
       asg_min_size = var.app_asg_min_size,
       instance_type = var.app_asg_instance_type,
-      kubelet_extra_args = "--node-labels=tier=app"
+      kubelet_extra_args = "--node-labels=tier=app --register-with-taints=tier=app_only:NoSchedule"
       name = "app",
       autoscaling_enabled = true,
       protect_from_scale_in = false,
-      subnets = var.private_subnets_app,
+      subnets = slice(var.private_subnets, 3, 6)
     },
     {
       asg_desired_capacity = var.db_asg_min_size,
       asg_max_size = var.db_asg_max_size,
       asg_min_size = var.db_asg_min_size,
       instance_type = var.db_asg_instance_type,
-      kubelet_extra_args = "--node-labels=tier=data"
+      kubelet_extra_args = "--node-labels=tier=data --register-with-taints=tier=data_only:NoSchedule"
       name = "db",
       autoscaling_enabled = true,
       protect_from_scale_in = false,
-      subnets = var.private_subnets_db,
+      subnets = slice(var.private_subnets, 6, 9)
     }
   )
   map_users          = var.map_users
   map_roles          = var.map_roles
-}
-
-resource "kubernetes_namespace" "build" {
-  depends_on = [module.eks.cluster_id]
-  metadata {
-    labels = {
-      Name = "build"
-    }
-    name = "build"
-  }
-}
-resource "kubernetes_namespace" "app" {
-  depends_on = [module.eks.cluster_id]
-  metadata {
-    labels = {
-      Name = "app"
-    }
-    name = "app"
-  }
-}
-resource "kubernetes_namespace" "db" {
-  depends_on = [module.eks.cluster_id]
-  metadata {
-    labels = {
-      Name = "db"
-    }
-    name = "db"
-  }
 }

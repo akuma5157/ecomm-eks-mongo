@@ -8,19 +8,23 @@ output "private_subnets" {
   value = module.vpc.private_subnets
 }
 output "private_subnets_build" {
-  value = [for s in data.aws_subnet.build : s.id]
+    value = slice(module.vpc.private_subnets, 0, 3)
+//  value = [for s in data.aws_subnet.build : s.id]
 }
 
 output "private_subnets_app" {
-  value = [for s in data.aws_subnet.app : s.id]
+  value = slice(module.vpc.private_subnets, 3, 6)
+//  value = [for s in data.aws_subnet.app : s.id]
 }
 
 output "private_subnets_db" {
-  value = [for s in data.aws_subnet.db : s.id]
+    value = slice(module.vpc.private_subnets, 6, 9)
+//  value = [for s in data.aws_subnet.db : s.id]
 }
 
 output "public_subnets_bastion" {
-  value = [for s in data.aws_subnet.bastion: s.id]
+    value = module.vpc.public_subnets
+//  value = [for s in data.aws_subnet.bastion: s.id]
 }
 output "public_subnets" {
   value = module.vpc.public_subnets

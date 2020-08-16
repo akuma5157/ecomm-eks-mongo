@@ -36,6 +36,16 @@ variable "env" {
   default = "test"
 }
 
+variable "private_subnets" {
+  type = list(string)
+  default = [""]
+}
+
+variable "public_subnets" {
+  type = list(string)
+  default = [""]
+}
+
 variable "private_subnets_build" {
   type = list(string)
   default = [""]

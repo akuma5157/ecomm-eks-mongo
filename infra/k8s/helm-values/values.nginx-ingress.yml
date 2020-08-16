@@ -1,0 +1,22 @@
+controller:
+  service:
+    externalTrafficPolicy: Local
+    type: NodePort
+  publishService:
+    enabled: true
+  config:
+    server-tokens: false
+    compute-full-forwarded-for: true
+    use-forwarded-headers: true
+    use-proxy-protocol: false
+  metrics:
+    enabled: true
+  autoscaling:
+    maxReplicas: 1
+    minReplicas: 1
+    enabled: true
+serviceAccount:
+  create: true
+rbac:
+  create: true
+

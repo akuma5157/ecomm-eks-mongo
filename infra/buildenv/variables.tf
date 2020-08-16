@@ -85,3 +85,5 @@ variable "bastion_asg_min_size" {
 variable "bastion_asg_max_size" {
   default = "2"
 }
+
+variable "eks_cluster_sec_grp" {}

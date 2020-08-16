@@ -10,7 +10,7 @@ variable "env" {
 
 variable "route53_domain_name" {
   type = string
-  default = "ecomm-eks-mongo-akuma.com"
+  default = "akuma5157.net"
 }
 
 variable "name" {
@@ -58,7 +58,7 @@ variable "bastion_asg_max_size" {
 }
 
 variable "jenkins_instance_type" {
-  default = "t2.micro"
+  default = "t2.small"
 }
 
 variable "jenkins_sec_grp_allow_ips" {
@@ -104,16 +104,16 @@ variable "public_subnet_bastion_cidr" {
 
 variable "build_asg_min_size" {
   description = "min nodes the cluster will have."
-  default     = "1"
+  default     = "2"
 }
 
 variable "build_asg_max_size" {
   description = "max nodes the cluster will autoscale to."
-  default     = "2"
+  default     = "4"
 }
 
 variable "build_asg_instance_type" {
-  default = "t2.micro"
+  default = "t2.small"
 }
 
 variable "app_asg_min_size" {
@@ -127,19 +127,19 @@ variable "app_asg_max_size" {
 }
 
 variable "app_asg_instance_type" {
-  default = "t2.micro"
+  default = "t2.small"
 }
 
 variable "db_asg_min_size" {
   description = "min nodes the cluster will have."
-  default     = "1"
+  default     = "2"
 }
 
 variable "db_asg_max_size" {
   description = "max nodes the cluster will autoscale to."
-  default     = "2"
+  default     = "4"
 }
 
 variable "db_asg_instance_type" {
-  default = "t2.micro"
+  default = "t2.small"
 }

@@ -3,7 +3,9 @@
 
   vars:
     jenkins_java_options: "-Djenkins.install.runSetupWizard=false"
+    jenkins_plugins_install_dependencies: true
     jenkins_plugins:
+      - aws-credentials
       - kubernetes
       - git
       - pipeline-utility-steps
@@ -23,9 +25,12 @@
       apt: update_cache=yes cache_valid_time=600
       when: ansible_os_family == 'Debian'
       changed_when: false
-  roles:
-    - role: geerlingguy.java
-    - role: geerlingguy.jenkins
+#  roles:
+#    - role: geerlingguy.java
+#    - role: geerlingguy.jenkins
+#    - role: geerlingguy.docker
+#    - role: geerlingguy.helm
+#    - role: gantsign.maven
 
   tasks:
     - name: Forward port 80 to 8080
@@ -39,3 +44,44 @@
         jump: REDIRECT
         to_ports: 8080
         comment: Redirect web traffic to port 8080
+    - name: create {{ ansible_user }} .kube directory
+      file:
+        path: "/home/{{ ansible_user }}/.kube"
+        state: directory
+        owner: "{{ ansible_user }}"
+        group: "{{ ansible_user }}"
+    - name: load {{ ansible_user }} kube config
+      copy:
+        src: "{{ kubeconfig_path }}"
+        dest: "/home/{{ ansible_user }}/.kube/config"
+        mode: '644'
+        owner: "{{ ansible_user }}"
+        group: "{{ ansible_user }}"
+    - name: create jenkins .kube directory
+      file:
+        path: "/var/lib/jenkins/.kube"
+        state: directory
+        owner: "jenkins"
+        group: "jenkins"
+    - name: load jenkins kube config
+      copy:
+        src: "{{ kubeconfig_path }}"
+        dest: "/var/lib/jenkins/.kube/config"
+        mode: '644'
+        owner: "jenkins"
+        group: "jenkins"
+    - name: get kubectl
+      get_url:
+        url: "https://storage.googleapis.com/kubernetes-release/release/v1.18.8/bin/linux/amd64/kubectl"
+        dest: /usr/local/bin/kubectl
+        mode: '755'
+    - name: get aws-iam-authenticator
+      get_url:
+        url: "https://amazon-eks.s3.us-west-2.amazonaws.com/1.17.7/2020-07-08/bin/linux/amd64/aws-iam-authenticator"
+        dest: /usr/local/bin/aws-iam-authenticator
+        mode: '755'
+    - name: add jenkins to docker group
+      user:
+        name: jenkins
+        groups: jenkins,docker
+        append: yes
