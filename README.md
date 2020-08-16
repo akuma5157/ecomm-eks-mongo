@@ -71,6 +71,10 @@ This will ensure confidence in the DR setup as well as keep the backups hot.
 * internal security groups : WIP
 * k8s rbac matrix and svc acc : WIP
 
+#### Sample Jenkinsfiles
+https://gitlab.com/akuma5157/samplespringapp/-/blob/master/Jenkinsfile-shell
+https://gitlab.com/akuma5157/samplespringapp/-/blob/master/Jenkinsfile
+
 
 ### Tech Stack
 | Type | Tool |
