@@ -16,7 +16,7 @@
       - github-branch-source
       - command-launcher
       - pipeline-utility-steps
-    jenkins_plugins_state: latest
+#    jenkins_plugins_state: latest
     jenkins_hostname: "{{ ansible_hostname }}"
     java_packages:
         - openjdk-8-jdk
@@ -25,12 +25,12 @@
       apt: update_cache=yes cache_valid_time=600
       when: ansible_os_family == 'Debian'
       changed_when: false
-#  roles:
-#    - role: geerlingguy.java
-#    - role: geerlingguy.jenkins
-#    - role: geerlingguy.docker
-#    - role: geerlingguy.helm
-#    - role: gantsign.maven
+  roles:
+    - role: geerlingguy.java
+    - role: geerlingguy.jenkins
+    - role: geerlingguy.docker
+    - role: geerlingguy.helm
+    - role: gantsign.maven
 
   tasks:
     - name: Forward port 80 to 8080
