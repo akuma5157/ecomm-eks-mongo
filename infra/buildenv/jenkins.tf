@@ -59,6 +59,6 @@ resource "null_resource" "jenkins_update" {
   }
   provisioner "local-exec" {
     working_dir = path.module
-    command = "ansible-playbook -u ubuntu -i ${aws_instance.jenkins.public_dns}, jenkins-playbook.yml --ssh-extra-args '-o StrictHostKeyChecking=no' --private-key ${path.cwd}/${var.name}_key -e kubeconfig_path='${path.cwd}/kubeconfig_${var.name}-EKS' -e jenkins_admin_username='${var.jenkins_admin_username}' -e jenkins_admin_password='${var.jenkins_admin_password}' -e ansible_python_interpreter='/usr/bin/python3'"
+    command = "sleep 45 && ansible-playbook -u ubuntu -i ${aws_instance.jenkins.public_dns}, jenkins-playbook.yml --ssh-extra-args '-o StrictHostKeyChecking=no' --private-key ${path.cwd}/${var.name}_key -e kubeconfig_path='${path.cwd}/kubeconfig_${var.name}-EKS' -e jenkins_admin_username='${var.jenkins_admin_username}' -e jenkins_admin_password='${var.jenkins_admin_password}' -e ansible_python_interpreter='/usr/bin/python3'"
   }
 }

@@ -41,7 +41,7 @@ variable "map_roles" {
 }
 
 variable "bastion_instance_type" {
-  default = "t2.micro"
+  default = "t3a.small"
 }
 
 variable "bastion_sec_grp_allow_ips" {
@@ -50,15 +50,15 @@ variable "bastion_sec_grp_allow_ips" {
 }
 
 variable "bastion_asg_min_size" {
-  default = "1"
+  default = "0"
 }
 
 variable "bastion_asg_max_size" {
-  default = "2"
+  default = "0"
 }
 
 variable "jenkins_instance_type" {
-  default = "t2.small"
+  default = "t3a.small"
 }
 
 variable "jenkins_sec_grp_allow_ips" {
@@ -104,42 +104,42 @@ variable "public_subnet_bastion_cidr" {
 
 variable "build_asg_min_size" {
   description = "min nodes the cluster will have."
-  default     = "2"
+  default     = "0"
 }
 
 variable "build_asg_max_size" {
   description = "max nodes the cluster will autoscale to."
-  default     = "4"
+  default     = "3"
 }
 
 variable "build_asg_instance_type" {
-  default = "t2.small"
+  default = "t3a.small"
 }
 
 variable "app_asg_min_size" {
   description = "min nodes the cluster will have."
-  default     = "1"
+  default     = "0"
 }
 
 variable "app_asg_max_size" {
   description = "max nodes the cluster will autoscale to."
-  default     = "2"
+  default     = "3"
 }
 
 variable "app_asg_instance_type" {
-  default = "t2.small"
+  default = "t3a.small"
 }
 
 variable "db_asg_min_size" {
   description = "min nodes the cluster will have."
-  default     = "2"
+  default     = "0"
 }
 
 variable "db_asg_max_size" {
   description = "max nodes the cluster will autoscale to."
-  default     = "4"
+  default     = "3"
 }
 
 variable "db_asg_instance_type" {
-  default = "t2.small"
+  default = "t3a.small"
 }
