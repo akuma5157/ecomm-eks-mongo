@@ -286,10 +286,10 @@ EOP
 
 resource "aws_iam_role_policy_attachment" "eks_alb_policy" {
   policy_arn = aws_iam_policy.eks_alb_policy.arn
-  role = aws_iam_role.eks_alb.arn
+  role = aws_iam_role.eks_alb.name
 }
 
 resource "aws_iam_role_policy_attachment" "eks_ingress_policy" {
   policy_arn = aws_iam_policy.eks_ingress_policy.arn
-  role = aws_iam_role.eks_alb.arn
+  role = aws_iam_role.eks_alb.name
 }
